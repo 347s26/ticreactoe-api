@@ -15,17 +15,21 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# https://w3.cs.jmu.edu/cs347/s26/prep/05/#instruct-django-project-to-use-env-file
+import environ
+env = environ.Env()
+env.read_env(str(BASE_DIR / ".env.local"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-voj5u4t68$8rcz9xg1cysr2rt=fyxx&@=x$arh!dajf()!6!14'
+SECRET_KEY = env.str("DJANGO_SECRET_KEY", default="django-insecure-voj5u4t68$8rcz9xg1cysr2rt=fyxx&@=x$arh!dajf()!6!14")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[])
 
 
 # Application definition
@@ -37,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'game',
 ]
 
 MIDDLEWARE = [
@@ -73,10 +78,12 @@ WSGI_APPLICATION = 'ticreactoe.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    # 'default': env.db("DJANGO_DATABASE_URL", default="sqlite:///db.sqlite3"),
+    'default': env.db("DJANGO_DATABASE_URL"), # raises ImproperlyConfigured exception if not found
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
 }
 
 
@@ -104,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = env.str("DJANGO_TIME_ZONE", default="UTC")
 
 USE_I18N = True
 
