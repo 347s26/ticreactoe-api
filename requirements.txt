@@ -1,3 +1,7 @@
 Django~=5.2
 django-environ~=0.13
 django-ninja~=1.5
+django-cors-headers~=4.9
+django-extensions~=4.1
+django-allauth[socialaccount]~=65.14
+# requests~=2.32
