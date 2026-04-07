@@ -4,4 +4,6 @@ django-ninja~=1.5
 django-cors-headers~=4.9
 django-extensions~=4.1
 django-allauth[socialaccount]~=65.14
+channels~=4.2
+daphne~=4.1
 # requests~=2.32

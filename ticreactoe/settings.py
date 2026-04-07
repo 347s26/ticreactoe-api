@@ -52,12 +52,14 @@ HEADLESS_FRONTEND_URLS = {
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     "game",
     "corsheaders",
     "django_extensions",
@@ -122,6 +124,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "ticreactoe.wsgi.application"
+ASGI_APPLICATION = "ticreactoe.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 
 # Database
@@ -183,18 +192,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 SOCIALACCOUNT_PROVIDERS = {
-    "openid_connect": {
-        "APPS": [
-            {
-                "provider_id": "canvas",
-                "name": "Canvas",
-                "client_id": env.str("CANVAS_CLIENT_ID"),
-                "secret": env.str("CANVAS_CLIENT_SECRET"),
-                "settings": {
-                    # allauth auto-discovers OIDC config from <server_url>/.well-known/openid-configuration
-                    "server_url": env.str("CANVAS_SERVER_URL"),
-                },
-            }
-        ]
-    }
+    # "openid_connect": {
+    #     "APPS": [
+    #         {
+    #             "provider_id": "canvas",
+    #             "name": "Canvas",
+    #             "client_id": env.str("CANVAS_CLIENT_ID"),
+    #             "secret": env.str("CANVAS_CLIENT_SECRET"),
+    #             "settings": {
+    #                 # allauth auto-discovers OIDC config from <server_url>/.well-known/openid-configuration
+    #                 "server_url": env.str("CANVAS_SERVER_URL"),
+    #             },
+    #         }
+    #     ]
+    # }
 }
