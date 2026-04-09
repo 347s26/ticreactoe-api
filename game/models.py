@@ -18,7 +18,10 @@ def generate_join_code():
 
 class Player(models.Model):
     handle = models.CharField(max_length=255, blank=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    # user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True) # if a user may have only 1 Player
+    
+    # Allowing multiple Players per User for flexibility in testing and gameplay
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) 
 
     def __str__(self):
         if self.user:

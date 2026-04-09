@@ -35,14 +35,21 @@ def get_player(request, handle: str):
 
 @api.post('/player/{handle}')
 def create_player(request, handle: str):
+    user = request.user if request.user.is_authenticated else None
     player, created = Player.objects.get_or_create(handle=handle)
     if created:
+        if user:
+            player.user = user
+            player.save()
         return {"message": f"Player '{handle}' created."}
     return {"message": f"Player '{handle}' already exists."}
 
 @api.post('/player/{handle}/game', response=GameSchema)
 def create_game(request, handle: str):
-    player = get_object_or_404(Player, handle=handle)
+    player, created = Player.objects.get_or_create(handle=handle)
+    if created and request.user.is_authenticated:
+        player.user = request.user
+        player.save()
     game = Game.objects.create_game(creator=player)
     return game
 
@@ -53,7 +60,13 @@ def join_game(request, join_code: str, handle: str):
         return {"error": "Game is already completed."}
     if game.opponent:
         return {"error": "Game already has an opponent."}
-    player = Player.objects.get_or_create(handle=handle)[0]
+    if request.user.is_authenticated:
+        player, created = Player.objects.get_or_create(handle=handle)
+        if created:
+            player.user = request.user
+            player.save()
+    else:
+        player = Player.objects.create(handle=handle)
     game.opponent = player
     game.save()
     return game
@@ -82,12 +95,6 @@ def get_game_state(request, handle: str, join_code: str):
     if game.creator.handle != handle and (not game.opponent or game.opponent.handle != handle):
         return {"error": "Player is not part of this game."}
     return game
-
-WIN_LINES = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8],
-    [0, 3, 6], [1, 4, 7], [2, 5, 8],
-    [0, 4, 8], [2, 4, 6],
-]
 
 
 def _serialize_game(game):
@@ -136,12 +143,6 @@ def make_move(request, handle: str, join_code: str, data: MoveSchema):
     # Toggle own mark off; overwrite opponent's mark; place on empty cell
     board[cell_index] = None if board[cell_index] == symbol else symbol
     GameState.objects.create(game=game, state_data={"board_state": board})
-
-    won = any(board[a] == board[b] == board[c] == symbol for a, b, c in WIN_LINES)
-    draw = not won and all(cell is not None for cell in board)
-    if won or draw:
-        game.in_progress = False
-        game.save()
 
     game.refresh_from_db()
 
