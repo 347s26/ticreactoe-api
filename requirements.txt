@@ -6,4 +6,6 @@ django-extensions~=4.1
 django-allauth[socialaccount]~=65.14
 channels~=4.2
 daphne~=4.1
+psycopg2-binary~=2.9
+whitenoise~=6.9
 # requests~=2.32

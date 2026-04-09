@@ -43,10 +43,11 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # These are the URLs to be implemented by your single-page application.
+_FRONTEND_URL = env.str("DJANGO_FRONTEND_URL", default="http://localhost:5173")
 HEADLESS_FRONTEND_URLS = {
-    "account_confirm_email": "https://localhost:5173/account/verify-email/{key}",
-    "account_reset_password_from_key": "https://localhost:5173/account/password/reset/key/{key}",
-    "account_signup": "https://localhost:5173/account/signup",
+    "account_confirm_email": f"{_FRONTEND_URL}/account/verify-email/{{key}}",
+    "account_reset_password_from_key": f"{_FRONTEND_URL}/account/password/reset/key/{{key}}",
+    "account_signup": f"{_FRONTEND_URL}/account/signup",
 }
 
 # Application definition
@@ -74,6 +75,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -93,12 +95,12 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = [
+CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
-]
+])
 # from corsheaders.defaults import default_headers
 
 # CORS_ALLOW_HEADERS = (
@@ -183,6 +185,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
